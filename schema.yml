@@ -1,0 +1,1528 @@
+openapi: 3.0.3
+info:
+  title: ValorantPros API Project
+  version: 1.0.0
+  description: A sample web application about pro Valorant players
+paths:
+  /api/v1/auth/token/login/:
+    post:
+      operationId: api_v1_auth_token_login_create
+      description: Use this endpoint to obtain user authentication token.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenCreate'
+          description: ''
+  /api/v1/auth/token/logout/:
+    post:
+      operationId: api_v1_auth_token_logout_create
+      description: Use this endpoint to logout user (remove user authentication token).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/users/:
+    get:
+      operationId: api_v1_auth_users_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: api_v1_auth_users_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/v1/auth/users/{id}/:
+    get:
+      operationId: api_v1_auth_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_v1_auth_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: api_v1_auth_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_v1_auth_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/users/activation/:
+    post:
+      operationId: api_v1_auth_users_activation_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Activation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Activation'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activation'
+          description: ''
+  /api/v1/auth/users/me/:
+    get:
+      operationId: api_v1_auth_users_me_retrieve
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_v1_auth_users_me_update
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: api_v1_auth_users_me_partial_update
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_v1_auth_users_me_destroy
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/users/resend_activation/:
+    post:
+      operationId: api_v1_auth_users_resend_activation_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_password/:
+    post:
+      operationId: api_v1_auth_users_reset_password_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_password_confirm/:
+    post:
+      operationId: api_v1_auth_users_reset_password_confirm_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetConfirm'
+          description: ''
+  /api/v1/auth/users/reset_username/:
+    post:
+      operationId: api_v1_auth_users_reset_username_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /api/v1/auth/users/reset_username_confirm/:
+    post:
+      operationId: api_v1_auth_users_reset_username_confirm_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameResetConfirm'
+          description: ''
+  /api/v1/auth/users/set_password/:
+    post:
+      operationId: api_v1_auth_users_set_password_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPassword'
+          description: ''
+  /api/v1/auth/users/set_username/:
+    post:
+      operationId: api_v1_auth_users_set_username_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetUsername'
+          description: ''
+  /api/v1/player/{id}/:
+    get:
+      operationId: api_v1_player_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    put:
+      operationId: api_v1_player_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Player'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Player'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    patch:
+      operationId: api_v1_player_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    delete:
+      operationId: api_v1_player_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/players-list/:
+    get:
+      operationId: api_v1_players_list_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: team
+        schema:
+          type: string
+          title: Team_name
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlayerList'
+          description: ''
+    post:
+      operationId: api_v1_players_list_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Player'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Player'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+  /api/v1/team/{name}/:
+    get:
+      operationId: api_v1_team_retrieve
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+          title: Team_name
+        description: A unique value identifying this team.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+    put:
+      operationId: api_v1_team_update
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+          title: Team_name
+        description: A unique value identifying this team.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Team'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Team'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+    patch:
+      operationId: api_v1_team_partial_update
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+          title: Team_name
+        description: A unique value identifying this team.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTeam'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTeam'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTeam'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+    delete:
+      operationId: api_v1_team_destroy
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+          title: Team_name
+        description: A unique value identifying this team.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/team/{id}/add-existing-player:
+    get:
+      operationId: api_v1_team_add_existing_player_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExistingPlayerList'
+          description: ''
+    put:
+      operationId: api_v1_team_add_existing_player_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExistingPlayer'
+          description: ''
+    patch:
+      operationId: api_v1_team_add_existing_player_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExistingPlayer'
+          description: ''
+  /api/v1/team/{id}/add-new-player:
+    get:
+      operationId: api_v1_team_add_new_player_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlayerList'
+          description: ''
+    post:
+      operationId: api_v1_team_add_new_player_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Player'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Player'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+  /api/v1/teams-list/:
+    get:
+      operationId: api_v1_teams_list_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: region
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTeamList'
+          description: ''
+components:
+  schemas:
+    Activation:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - token
+      - uid
+    ExistingPlayer:
+      type: object
+      properties:
+        full_name:
+          type: string
+          readOnly: true
+        in_game_name:
+          $ref: '#/components/schemas/InGameNameEnum'
+        in_game_role:
+          type: string
+          readOnly: true
+          title: Role
+        team:
+          type: string
+          title: Team_name
+          readOnly: true
+          nullable: true
+        twitter_link:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          title: Twitter
+        twitch_link:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          title: Twitch
+      required:
+      - full_name
+      - in_game_name
+      - in_game_role
+      - team
+      - twitch_link
+      - twitter_link
+    InGameNameEnum:
+      enum:
+      - Enzo
+      - Mistic
+      - Demon1
+      - aspas
+      - Xeppaa
+      - OXY
+      - sdfsdf
+      - dfgdfg
+      - www
+      - fefefef
+      - wwwww
+      - ttttt
+      - nAts
+      - Jamppi
+      - Keiko
+      - QutionerX
+      - Brave
+      - Elite
+      - pAura
+      - reazy
+      - Boaster
+      - Derke
+      - Alfajer
+      - Chronicle
+      - hiro
+      - Boo
+      - benjyfishy
+      - MiniBoo
+      - RieNs
+      - Wo0t
+      - MrFaliN
+      - qRaxs
+      - ATA KAPTAN
+      - yetujey
+      - cNed
+      - Shin
+      - Magnum
+      - marteen
+      - N4RRATE
+      - tomaszy
+      - ANGE1
+      - SUYGETSU
+      - Shao
+      - Zyppan
+      - ardiis
+      - beyAz
+      - nataNk
+      - TakaS
+      - Wailers
+      - kAdavra
+      - ceNder
+      - runneR
+      - Kicks
+      - Sayf
+      - trexx
+      - Cloud
+      - hoody
+      - Fit1nho
+      - purp0
+      - Famsii
+      - Sheydos
+      - starxo
+      - GRUBINHO
+      - kamo
+      - ShadoW
+      - kaajak
+      - AvovA
+      - hype
+      - MOLSI
+      - soulcas
+      type: string
+      description: |-
+        * `Enzo` - Enzo
+        * `Mistic` - Mistic
+        * `Demon1` - Demon1
+        * `aspas` - aspas
+        * `Xeppaa` - Xeppaa
+        * `OXY` - OXY
+        * `sdfsdf` - sdfsdf
+        * `dfgdfg` - dfgdfg
+        * `www` - www
+        * `fefefef` - fefefef
+        * `wwwww` - wwwww
+        * `ttttt` - ttttt
+        * `nAts` - nAts
+        * `Jamppi` - Jamppi
+        * `Keiko` - Keiko
+        * `QutionerX` - QutionerX
+        * `Brave` - Brave
+        * `Elite` - Elite
+        * `pAura` - pAura
+        * `reazy` - reazy
+        * `Boaster` - Boaster
+        * `Derke` - Derke
+        * `Alfajer` - Alfajer
+        * `Chronicle` - Chronicle
+        * `hiro` - hiro
+        * `Boo` - Boo
+        * `benjyfishy` - benjyfishy
+        * `MiniBoo` - MiniBoo
+        * `RieNs` - RieNs
+        * `Wo0t` - Wo0t
+        * `MrFaliN` - MrFaliN
+        * `qRaxs` - qRaxs
+        * `ATA KAPTAN` - ATA KAPTAN
+        * `yetujey` - yetujey
+        * `cNed` - cNed
+        * `Shin` - Shin
+        * `Magnum` - Magnum
+        * `marteen` - marteen
+        * `N4RRATE` - N4RRATE
+        * `tomaszy` - tomaszy
+        * `ANGE1` - ANGE1
+        * `SUYGETSU` - SUYGETSU
+        * `Shao` - Shao
+        * `Zyppan` - Zyppan
+        * `ardiis` - ardiis
+        * `beyAz` - beyAz
+        * `nataNk` - nataNk
+        * `TakaS` - TakaS
+        * `Wailers` - Wailers
+        * `kAdavra` - kAdavra
+        * `ceNder` - ceNder
+        * `runneR` - runneR
+        * `Kicks` - Kicks
+        * `Sayf` - Sayf
+        * `trexx` - trexx
+        * `Cloud` - Cloud
+        * `hoody` - hoody
+        * `Fit1nho` - Fit1nho
+        * `purp0` - purp0
+        * `Famsii` - Famsii
+        * `Sheydos` - Sheydos
+        * `starxo` - starxo
+        * `GRUBINHO` - GRUBINHO
+        * `kamo` - kamo
+        * `ShadoW` - ShadoW
+        * `kaajak` - kaajak
+        * `AvovA` - AvovA
+        * `hype` - hype
+        * `MOLSI` - MOLSI
+        * `soulcas` - soulcas
+    PaginatedExistingPlayerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExistingPlayer'
+    PaginatedPlayerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+    PaginatedTeamList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PasswordResetConfirm:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+        new_password:
+          type: string
+      required:
+      - new_password
+      - token
+      - uid
+    PatchedExistingPlayer:
+      type: object
+      properties:
+        full_name:
+          type: string
+          readOnly: true
+        in_game_name:
+          $ref: '#/components/schemas/InGameNameEnum'
+        in_game_role:
+          type: string
+          readOnly: true
+          title: Role
+        team:
+          type: string
+          title: Team_name
+          readOnly: true
+          nullable: true
+        twitter_link:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          title: Twitter
+        twitch_link:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          title: Twitch
+    PatchedPlayer:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 255
+        in_game_name:
+          type: string
+          title: Name
+          maxLength: 50
+        in_game_role:
+          type: string
+          title: Role
+          maxLength: 15
+        team:
+          type: string
+          title: Team_name
+          nullable: true
+        twitter_link:
+          type: string
+          format: uri
+          nullable: true
+          title: Twitter
+          maxLength: 200
+        twitch_link:
+          type: string
+          format: uri
+          nullable: true
+          title: Twitch
+          maxLength: 200
+    PatchedTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          title: Team_name
+          maxLength: 20
+        region:
+          type: string
+          maxLength: 10
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+    Player:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 255
+        in_game_name:
+          type: string
+          title: Name
+          maxLength: 50
+        in_game_role:
+          type: string
+          title: Role
+          maxLength: 15
+        team:
+          type: string
+          title: Team_name
+          nullable: true
+        twitter_link:
+          type: string
+          format: uri
+          nullable: true
+          title: Twitter
+          maxLength: 200
+        twitch_link:
+          type: string
+          format: uri
+          nullable: true
+          title: Twitch
+          maxLength: 200
+      required:
+      - full_name
+      - in_game_name
+      - in_game_role
+    SendEmailReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+      - current_password
+      - new_password
+    SetUsername:
+      type: object
+      properties:
+        current_password:
+          type: string
+        new_username:
+          type: string
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - current_password
+      - new_username
+    Team:
+      type: object
+      properties:
+        name:
+          type: string
+          title: Team_name
+          maxLength: 20
+        region:
+          type: string
+          maxLength: 10
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+          readOnly: true
+      required:
+      - name
+      - players
+      - region
+    TokenCreate:
+      type: object
+      properties:
+        password:
+          type: string
+        username:
+          type: string
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+      required:
+      - id
+      - username
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - id
+      - password
+      - username
+    UsernameResetConfirm:
+      type: object
+      properties:
+        new_username:
+          type: string
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - new_username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

@@ -1,0 +1,13 @@
+{% if highlights_data %}
+    <div class="highlights-container">
+        {% for data in highlights_data %}
+            <div class="highlight-video-card">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ data.highlight__video_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <h3>{{ data.highlight__video_title }}</h3>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <h2>There are no highlights for this player</h2>
+{% endif %}
+    

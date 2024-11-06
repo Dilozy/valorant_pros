@@ -1,0 +1,13 @@
+{% if show_pagination %}
+<div class="pagination">
+    <ul>
+        {% for page_number in pages_range %}
+        {% if page_number == page_obj.paginator.ELLIPSIS %}
+            {{ page_number }}
+        {% else %}
+            <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

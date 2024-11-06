@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block category %}
+<div class="container">
+    <div class="category">
+        <p>Edit: {{ player.in_game_name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="add-form">
+        <form action="{% url 'pro_players:edit_player' player.slug %}" method="POST">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <input type="submit" value="Сохранить">
+        </form>
+    </div>
+{% endblock content %}
+

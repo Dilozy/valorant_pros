@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ team.name|capfirst }}{% endblock %}
+
+
+{% block category %}
+<div class="header-menu">
+    <div class="category">
+        <p>{{ team.name }}</p>
+    </div>
+</div>
+{% endblock category %}
+
+{% block content %}
+<div class="cards-container">
+    {% for player in players %}
+    <div class="player-card">
+        {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'pro_players:delete_player' region team.slug player.slug %}">
+                <button class="delete-btn" onclick="return confirm('Are you sure you want to delete this player?');">&times;</button>
+                {% csrf_token %}
+            </form>
+        {% endif %}
+        {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+            <a href="{{ player.get_absolute_url }}?next={{ request.path }}"><img src="{% static image_path %}" alt=""></a>
+            <p>{{ player.in_game_name }}</p>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+{% endblock content %}
+
+{% block add_form %}
+    {% if request.user.is_staff %}
+        <div class="add-player-btn">
+            <a href="{% url 'pro_players:add_player_forms' region team.slug %}">
+                <p>Add player to the team</p>
+            </a>
+        </div>
+    {% else %}
+        <div class="login-required">
+            <h3>You need to <a href="{% url 'account:login' %}?next={{ request.path }}">log in</a> to be able to add players</h3>
+        </div>
+    {% endif %}
+{% endblock add_form %}
+
+{% block comments %}
+    {% with comments.count as total_comments %}
+        <h2>
+            {{ total_comments }} Comment{{ total_comments|pluralize }}
+        </h2>
+    {% endwith %}
+    {% for comment in comments %}
+        <div class="comment">
+            <p class="info">
+                Comment by <span class="comment-author">{{ comment.name }}</span> on
+                {{ comment.created|date:"d.j.Y H:i" }}
+            </p>
+            {{ comment.body|linebreaks }}
+        </div>
+    {% empty %}
+        <p>There are no comments.</p>
+    {% endfor %}
+    
+    {% if request.user.is_authenticated %}
+        {% include "utils/comment_form.html" %}
+    {% else %}
+        <div class="login-required">
+            <h3>You need to <a href="{% url 'account:login' %}?next={{ request.path }}">log in</a> to be able to add comments</h3>
+        </div>
+    {% endif %}
+{% endblock comments %}

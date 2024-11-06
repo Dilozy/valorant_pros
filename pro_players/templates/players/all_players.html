@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% load pro_players_tags %}
+
+
+{% block content %}
+    <div class="total-players-count">
+        <p>Total players <b>{% total_players %}</b></p>
+        <p><b>{% players_without_a_team %}</b> players are teamless</p>
+        <p>Filter by:</p>
+    
+    <form method="get">
+        {{ filter.form.as_p }}
+        <button type="submit">Filter</button>
+    </form>
+    
+    </div>
+    
+    <div class="cards-container">
+        {% for player in page_obj.object_list %}
+        {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+        <a href="{{ player.get_absolute_url }}?next={{ request.path }}">
+            <div class="player-card">
+                <img src="{% static image_path %}" alt="">
+                <p>{{ player.in_game_name }}</p>
+            </div>
+         </a>
+        {% endwith %}
+        {% endfor %}
+        
+    </div>
+    {% include "utils/pagination.html" with pages_range=pages_range %}
+
+{% endblock %}
+</html>

@@ -1,0 +1,76 @@
+.player-details-container {
+    text-align: center;
+}
+
+.player-details-card {
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: center; /* Центрируем содержимое */
+}
+
+.player-details-card img {
+    width: 50em; /* Ширина изображения будет 10 раз больше размера текста */
+    height: auto;
+}
+
+.player-details-card p {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.player-details-card a {
+    text-decoration: none; /* Убирает подчеркивание у ссылок */
+    color: black;
+}
+
+.header {
+    text-align: center; /* Центрирует элементы по вертикали */
+    margin-bottom: 30px;
+}
+
+.go-back-button {
+    flex: 0 0 10%; /* Зафиксированная ширина кнопки */
+}
+
+.email-recomendation {
+    margin-top: 50px;
+    border-style: solid;
+    border-width: 0.5px;
+    background-color: rgb(184, 250, 145);
+}
+
+#action-icons {
+    text-align: right;/* Расстояние между значками */
+    margin-bottom: 0.5em;
+}
+
+/* Значок редактирования */
+#action-icons.edit-icon {
+    font-size: 20px;
+    cursor: pointer;
+    color: black;
+}
+
+.highlights-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Позволяет перенос на новую строку, если больше двух элементов */
+    margin-top: 3em;
+}
+
+.highlight-video-card {
+    flex-basis: 48%; /* Каждый элемент занимает 48%, чтобы учесть отступы */
+    text-align: center;
+    box-sizing: border-box; /* Гарантирует, что padding и border входят в ширину */
+    margin-bottom: 3em; /* Отступ между строками */
+    max-width: 1200px; /* Ограничение максимальной ширины */
+    width: 100%; /* Контейнер занимает всю ширину доступного пространства */
+    margin: 0 auto; /* Центрирование контейнера */
+    padding: 0 20px; /* Отступы по бокам для дополнительного пространства */
+}
+
+h2 {
+    text-align: center;
+    margin-top: 2em;
+}

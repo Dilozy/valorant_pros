@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Add player{% endblock %}
+
+{% block add_form %}
+    <h2>Add new player</h2>
+    <div class="add-form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <input type="hidden" name="form_type" value="new_player">
+            <input type="submit" value="Add new player">
+        </form>
+    </div>
+
+
+    <h2>Choose from already existing</h2>
+    <div class="add-form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ existing_player_form.as_div }}
+            <input type="hidden" name="form_type" value="existing_player">
+            <input type="submit" value="Choose a player">
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+    
+{% block content %}
+
+    <h1>Login</h1>
+    {% if form.errors %}
+        <p>
+            Your username or password is invalid.
+            Please try again.
+        </p>
+    {% else %}
+        <p>Please, use the following form to log in. <br>
+           
+            If you don't have an account
+           <a href="{% url 'account:register' %}">register here</a>
+        </p>
+    {% endif %}
+    
+    <div class="login-form">
+        <form method="POST">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <input type="submit" value="Log in">
+        </form>
+        <p>
+            <a href="{% url 'account:password_reset' %}">
+                Forgotten you password?
+            </a>
+        </p>
+    </div>
+    
+    <div class="social">
+        <ul>
+            <li class="twitch">
+                <a href="{% url 'social:begin' 'twitch' %}">Sign in with Twitch</a>
+            </li>
+        </ul>
+    </div>
+
+{% endblock %}

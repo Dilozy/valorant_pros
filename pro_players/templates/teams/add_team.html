@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Add new team{% endblock %}
+
+{% block add_form %}
+    <h1>Add a new team to the {{ region }} region</h1>
+    <div class="add-form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <input type="submit" value="Add team">
+        </form>
+    </div>
+{% endblock %}

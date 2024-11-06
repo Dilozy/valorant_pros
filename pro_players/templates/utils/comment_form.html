@@ -1,0 +1,6 @@
+<h2>Share your thoughts about the team</h2>
+<form action="{% url 'pro_players:post_team_comment' team.region team.slug %}" method="POST">
+    {{ form.as_div }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add comment"></p>
+</form>

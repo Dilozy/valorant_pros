@@ -1,0 +1,20 @@
+{% extends "players/player_info.html" %}
+{% block content %}
+    {% if sent %}
+        <h1>Email successfully sent</h1>
+        <p>
+            Your recommendation was successfully sent
+            to {{ email_form.cleaned_data.to }}.
+        </p>
+        <div class="go-back-button">
+            <a href="{{ player.team.get_absolute_url }}"><button>&larr; Back</button></a>
+        </div>
+    {% else %}
+        <h1>Recommend the player {{ player.in_game_name }} by e-mail</h1>
+        <form method="POST">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Send e-mail">
+        </form>
+    {% endif %}
+{% endblock content %} 

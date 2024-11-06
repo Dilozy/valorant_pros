@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ player.in_game_name }}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/common_styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/player.css' %}">
+</head>
+<body>
+    {% block content %}
+    <div class="go-back-button">
+        <a href="{{ go_back_link }}"><button>&larr; Back</button></a>
+    </div>
+    <div class="header">
+        <div class="category">
+            <p>{{ player.in_game_name }}</p>
+        </div>
+    </div>
+
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">
+            {{ message|safe }}
+            <a href="#" class="close">x</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="player-details-container">
+        <div class="player-details-card">
+            <div id="action-icons">
+                <span class="edit-icon">
+                    <a href="{% url 'pro_players:edit_player' player.slug %}?next={{ request.path }}">&#9998;</a>
+                </span>
+            </div>
+            {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+                <img src="{% static image_path %}" alt="">
+            {% endwith %}
+            <p>Full name: {{ player.full_name }}</p>
+            <p>Team: {{ player.team|default_if_none:"Без команды" }}</p>
+            <p>Role: {{ player.in_game_role }}</p>
+            <p>Twitter: <a href="{{ player.twitter_link }}" target="_blank">{{ player.twitter_link }}</a></p>
+            <p>Twitch: <a href="{{ player.twitch_link }}" target="_blank">{{ player.twitch_link }}</a></p>
+        
+            <a href="{% url 'pro_players:send_email_recommendation' player.slug %}">
+                <div class="email-recomendation">
+                    <p>Recommend the player</p>
+                </div>
+            </a>
+        
+        </div>
+    </div>
+    {% endblock content %}
+    <h2>Highlights</h2>
+    {% include "players/player_highlights.html" %}
+
+</body>
+</html>

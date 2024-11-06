@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block add_form %}
+    <h1>Add highlight for {{ player.in_game_name }}</h1>
+    <form method="POST">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <input type="submit" value="Add highlight">
+    </form>
+{% endblock %}

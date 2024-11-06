@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/common_styles.css' %}">
+</head>
+
+<body>
+    <div class="login-container">
+      <span>
+        {% if request.user.is_authenticated %}
+          Hello, {{ user.username }} !
+          <p><a href="{% url 'account:profile' %}">My profile</a></p>
+          <form action="{% url 'account:logout' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'account:login' %}?next={{ request.path }}">Log in</a>
+        {% endif %}
+      </span>
+    </div>
+
+  <nav class="navbar">
+      <div class="menu-leagues"><a href="{% url 'pro_players:home' %}">Leagues</a></div>
+      <ul class="menu-categories">
+        <li><img src="https://liquipedia.net/commons/images/thumb/b/b3/VCT_2024_EMEA_League_lightmode.png/24px-VCT_2024_EMEA_League_lightmode.png" alt=""><a href="/EMEA/">EMEA</a></li>
+        <li><img src="https://liquipedia.net/commons/images/thumb/0/09/VCT_2023_Americas_League_allmode.png/23px-VCT_2023_Americas_League_allmode.png" alt=""><a href="#">Americas</a></li>
+        <li><img src="https://liquipedia.net/commons/images/thumb/5/54/VCT_2023_Pacific_League_allmode.png/24px-VCT_2023_Pacific_League_allmode.png" alt=""><a href="#">Pacific</a></li>
+        <li><img src="https://liquipedia.net/commons/images/thumb/d/dd/VCT_China_allmode.png/21px-VCT_China_allmode.png" alt=""><a href="#">China</a></li>
+        <li><a href="{% url 'pro_players:all-players' %}">All players</a></li>
+      </ul>
+    <a href=""></nav></a>
+    
+
+    {% block category %}{% endblock %}
+
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">
+            {{ message|safe }}
+            <a href="#" class="close">x</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+
+    {% block add_form %}{% endblock add_form %}
+    {% block comments %}{% endblock comments %}
+
+</body>
+
+</html>
