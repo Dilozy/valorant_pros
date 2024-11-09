@@ -13,7 +13,7 @@
     <div class="add-form">
         <form action="{% url 'pro_players:edit_player' player.slug %}" method="POST">
             {% csrf_token %}
-            {{ form.as_div }}
+            {{ form.as_p }}
             <input type="hidden" name="next" value="{{ request.GET.next }}">
             <input type="submit" value="Сохранить">
         </form>

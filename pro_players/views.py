@@ -1,8 +1,9 @@
 from typing import Any
+from django.shortcuts import render
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
@@ -10,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
-from .models import Comment, Team, Player
+from .models import Comment, Team, Player, Region
 from .forms import (
     EmailRecommendationForm, NewPlayerForm,
     CommentForm, ExistingPlayerForm,
@@ -28,7 +29,8 @@ class AllPlayersList(generic.ListView):
     model = Player
     template_name = "players/all_players.html"
     paginate_by = 9
-    
+
+
     def get_queryset(self) -> QuerySet[Any]:
         if self.request.GET.get("has_team") == "True":
             return Player.has_team.all()
@@ -52,15 +54,17 @@ class TeamsInRegionView(generic.ListView):
     context_object_name = "teams"
 
 
+    def get_queryset(self):
+        self.region = get_object_or_404(Region, name=self.kwargs.get("region"))
+        print(self.region)
+        return self.region.team_set.all()
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["region"] = self.kwargs.get("region")
+        context["region"] = self.region
+        print(self.region)
         return context
-
-
-    def get_queryset(self):
-        region = self.kwargs.get("region")
-        return Team.objects.filter(region__iexact=region)
 
 
 class AddTeamView(generic.CreateView):
@@ -133,11 +137,23 @@ class AddPlayerView(LoginRequiredMixin, generic.FormView):
     form_class = NewPlayerForm
 
 
+    def get_region_and_team(self):
+        """
+        Метод для получения региона и команды.
+        """
+        region_name = self.kwargs.get("region")
+        team_slug = self.kwargs.get("team_slug")
+        region = get_object_or_404(Region, name=region_name)
+        team = get_object_or_404(Team, slug=team_slug)
+        return region, team
+
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        region, team = self.get_region_and_team()
         context = super().get_context_data(**kwargs)
         context["existing_player_form"] = ExistingPlayerForm()
-        context["region"] = self.kwargs.get("region")
-        context["team_slug"] = self.kwargs.get("team_slug")
+        context["region"] = region.name
+        context["team_slug"] = team.slug
         return context
 
 
@@ -146,6 +162,7 @@ class AddPlayerView(LoginRequiredMixin, generic.FormView):
             new_player_form = NewPlayerForm(request.POST)
             if new_player_form.is_valid():
                 return self.form_valid(new_player_form)
+            return self.form_invalid(new_player_form)
         else:
             existing_player_form = ExistingPlayerForm(request.POST)
             if existing_player_form.is_valid():
@@ -153,20 +170,34 @@ class AddPlayerView(LoginRequiredMixin, generic.FormView):
              
 
     def get_success_url(self) -> str:
-        return reverse("pro_players:team_players", args=[self.kwargs.get("region"),
-                                                         self.kwargs.get("team_slug")])
+        region, team = self.get_region_and_team()
+        return reverse("pro_players:team_players", args=[region.name,
+                                                         team.slug])
 
 
     def form_valid(self, form):
+        _, team = self.get_region_and_team()
         if isinstance(form, NewPlayerForm):
             player = form.save(commit=False)
         else:
             player = form.cleaned_data["player"]
 
-        player.team = get_object_or_404(Team, slug=self.kwargs.get("team_slug"))
+        player.team = team
         player.save()
         messages.success(self.request, f"Игрок {player.in_game_name} успешно добавлен в команду")
         return super().form_valid(form)
+
+
+    def form_invalid(self, form: Any) -> HttpResponse:
+        region, team = self.get_region_and_team()
+        # Передаем всю необходимую информацию в контекст
+        context = {
+            "form": form,
+            "existing_player_form": ExistingPlayerForm(),  # Если она необходима в контексте
+            "region": region.name,
+            "team_slug": team.slug
+        }
+        return render(self.request, self.template_name, context=context)
 
 
 class DeleteTeamView(LoginRequiredMixin, generic.DeleteView):
@@ -180,20 +211,33 @@ class DeleteTeamView(LoginRequiredMixin, generic.DeleteView):
         return reverse("pro_players:teams", args=[self.kwargs.get("region")])
 
 
-class DeletePlayerView(LoginRequiredMixin, generic.DeleteView):
-    model = Player
+class DeletePlayerFromTeamView(LoginRequiredMixin, generic.View):
     slug_url_kwarg = "player_slug"
-    success_message = "The player has been deleted successfully"
+    success_message = "The player has been removed from the team successfully"
 
 
-    def get_success_url(self) -> str:
+    def get_object(self):
+        """Получаем объект игрока по slug."""
+        return Player.objects.get(slug=self.kwargs.get(self.slug_url_kwarg))
+
+
+    def get_success_url(self):
+        """Возвращаем URL для перенаправления после успешного удаления."""
+        return reverse("pro_players:team_players", args=[self.kwargs.get("region"), self.kwargs.get("team_slug")])
+
+
+    def post(self, request, *args, **kwargs):
+        """Обрабатываем запрос на удаление игрока из команды."""
+        player = self.get_object()
+        # Устанавливаем поле team в None
+        player.team = None
+        player.save()  # Сохраняем изменения в базе данных
+
+        # Отправляем сообщение об успехе
         messages.success(self.request, self.success_message)
-        return reverse("pro_players:team_players", args=[self.kwargs.get("region"),
-                                                         self.kwargs.get("team_slug")])
-
-
-    def delete(self, request, *args, **kwargs):
-        Player.objects.filter(slug=self.kwargs.get("player_slug")).update(team=None)
+        
+        # Перенаправляем на страницу команды
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class EditPlayerView(LoginRequiredMixin, generic.UpdateView):

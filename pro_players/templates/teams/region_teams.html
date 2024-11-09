@@ -6,13 +6,8 @@
 {% block category%}
     <div class="header-menu">
         <div class="category">
-            {% if region == 'emea' %}
             <p><img src="https://liquipedia.net/commons/images/thumb/b/b3/VCT_2024_EMEA_League_lightmode.png/24px-VCT_2024_EMEA_League_lightmode.png"
-                    alt=""><a href="/{{ region }}">{{ region|upper }}</a></p>
-            {% else %}
-            <p><img src="https://liquipedia.net/commons/images/thumb/b/b3/VCT_2024_EMEA_League_lightmode.png/24px-VCT_2024_EMEA_League_lightmode.png"
-                    alt=""><a href="/{{ region }}">{{ region|capfirst }}</a></p>
-            {% endif %}
+                    alt=""><a href="/{{ region }}">{{ region }}</a></p>
         </div>
     </div>
 {% endblock %}

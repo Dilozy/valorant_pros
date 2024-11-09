@@ -1,3 +1,4 @@
+import re
 from django import forms
 from .models import Highlight, Team, Player, Comment
 
@@ -26,6 +27,26 @@ class NewPlayerForm(forms.ModelForm):
     in_game_role = forms.ChoiceField(choices=ROLE_CHOICES, label="Role")
     twitter_link = forms.URLField(label="Twitter link", required=False)
     twitch_link = forms.URLField(label="Twitch link", required=False)
+
+
+    def clean_full_name(self):
+        full_name = self.cleaned_data.get("full_name")
+
+        match full_name.split():
+            case [str(name), str(surname)]:
+                return f"{name} {surname}".capitalize()
+            case _:
+                raise forms.ValidationError("Player full name is invalid")
+
+
+    def clean_in_game_name(self):
+        in_game_name = self.cleaned_data.get("in_game_name")
+        result = re.fullmatch(r"[A-Za-z0-9 ]{3,16}", in_game_name)
+
+        if result:
+            return in_game_name
+        raise forms.ValidationError("In game name is invalid")
+
 
     class Meta:
         model = Player

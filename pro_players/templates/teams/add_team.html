@@ -6,7 +6,7 @@
     <div class="add-form">
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_div }}
+            {{ form.as_p }}
             <input type="submit" value="Add team">
         </form>
     </div>

@@ -14,7 +14,7 @@ region_patterns = [
     path("delete/<slug:team_slug>/",
          views.DeleteTeamView.as_view(), name="delete_team"),
     path("<slug:team_slug>/delete/<slug:player_slug>/",
-         views.DeletePlayerView.as_view(), name="delete_player"),
+         views.DeletePlayerFromTeamView.as_view(), name="delete_player"),
     path("<slug:team_slug>/comment/",
          views.PostTeamCommentView.as_view(), name="post_team_comment"),
 ]

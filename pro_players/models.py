@@ -15,9 +15,21 @@ class HasTeamManager(models.Manager):
                       .filter(team__isnull=False)
 
 
+class Region(models.Model):
+    name = models.CharField(max_length=10, unique=True, verbose_name="Region name")
+
+
+    def __str__(self):
+        return self.name
+
+
+    class Meta:
+        db_table = "region"
+
+
 class Team(models.Model):
-    name = models.CharField(max_length=20, primary_key=True, verbose_name="Team name")
-    region = models.CharField(max_length=10, verbose_name="region")
+    name = models.CharField(max_length=20, verbose_name="Team name", primary_key=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name="Region")
     slug = models.SlugField(unique=True, blank=True)
 
 
