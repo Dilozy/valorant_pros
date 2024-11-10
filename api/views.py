@@ -6,11 +6,11 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
-from pro_players.models import Player, Team, Comment, Highlight
+from pro_players.models import Player, Team, Comment, Highlight, Region
 from .serializers import (
     PlayerSerializer, TeamSerializer,
     ExistingPlayerSerializer, CommentSerializer,
-    HighlightSerializer
+    HighlightSerializer, RegionSerializer,
 )
 from .permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
 
@@ -21,20 +21,43 @@ class PlayersListPagination(PageNumberPagination):
     max_page_size = 20
 
 
-class TeamAPIList(generics.ListAPIView):
+class AllTeamsListAPI(generics.ListAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["region"]
 
 
-class TeamAPIDetailsView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Team.objects.all()
+class RegionTeamsAPI(generics.ListCreateAPIView):
     serializer_class = TeamSerializer
     permission_classes = (IsAdminOrReadOnly, )
 
+
+    def dispatch(self, request, *args, **kwargs):
+        self.region = get_object_or_404(Region, id=kwargs.get("pk"))
+        return super().dispatch(request, *args, **kwargs)
+
+    
+    def get_queryset(self):
+        return Team.objects.filter(region=self.region)
+
+
+    def perform_create(self, serializer):
+        serializer.save(region=self.region)
+
+
+class TeamDetailsAPI(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TeamSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+
+
+    def get_object(self):
+        region = get_object_or_404(Region, id=self.kwargs.get("pk"))
+        team = get_object_or_404(Team, region=region, name=self.kwargs.get("team_pk"))
+        return team
             
-class PlayersAPIList(generics.ListCreateAPIView):
+
+class PlayersListAPI(generics.ListCreateAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     pagination_class = PlayersListPagination
@@ -50,7 +73,7 @@ class EradicatePlayerAPI(generics.RetrieveDestroyAPIView):
     permission_class = (IsAdminUser, )
 
 
-class PlayerAPIDetailsView(generics.RetrieveUpdateDestroyAPIView):
+class PlayerDetailsAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     permission_classes = (IsAdminOrReadOnly, )
@@ -154,3 +177,8 @@ class HighlightsListCreateAPI(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(player=self.player)
+
+
+class ListRegionsAPI(generics.ListAPIView):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer

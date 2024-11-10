@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from pro_players.models import Highlight, Player, Team, Comment
+from pro_players.models import Highlight, Player, Region, Team, Comment
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -59,6 +59,10 @@ class TeamSerializer(serializers.ModelSerializer):
             "name", "region", "players"
         ]
 
+        read_only_fields = [
+                "region",
+            ]
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,3 +84,9 @@ class HighlightSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "player",
         ]
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = "__all__"

@@ -16,8 +16,8 @@ teams_patterns = [
     path("<str:pk>/comments/",
          views.CommentListCreateAPI.as_view(),
          name="comments_list"),
-    path("<str:pk>/", views.TeamAPIDetailsView.as_view()),
-    path("", views.TeamAPIList.as_view()),
+    path("<str:team_pk>/", views.TeamDetailsAPI.as_view()),
+    path("", views.RegionTeamsAPI.as_view()),
 ]
 
 players_patterns = [
@@ -25,11 +25,17 @@ players_patterns = [
     path("<int:pk>/highlights/",
          views.HighlightsListCreateAPI.as_view(),
          name="list_highlights"),
-    path("teamless-players/",
+    path("teamless/",
          views.ListTeamlessPlayersAPI.as_view(),
          name="list_teamless_players"),
-    path("<int:pk>/", views.PlayerAPIDetailsView.as_view()),
-    path("", views.PlayersAPIList.as_view()),
+    path("<int:pk>/", views.PlayerDetailsAPI.as_view()),
+    path("", views.PlayersListAPI.as_view()),
+]
+
+
+regions_patterns = [
+    path("", views.ListRegionsAPI.as_view(), name="list_region"),
+    path("<int:pk>/teams/", include(teams_patterns)),
 ]
 
 
@@ -39,9 +45,10 @@ urlpatterns = [
     re_path(r"^auth/", include("djoser.urls.authtoken")),
     path("comments/<int:pk>/details/", views.CommentDetailsAPI.as_view()),
     path("schema/visualize/",
-         SpectacularSwaggerView.as_view(url_name="schema"),
+         SpectacularSwaggerView.as_view(url_name="api:schema"),
          name="swagger"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("teams/", include(teams_patterns)),
+    path("all-teams/", views.AllTeamsListAPI.as_view()),
     path("players/", include(players_patterns)),
+    path("regions/", include(regions_patterns)),
 ]
