@@ -126,8 +126,8 @@ ul.messages li a.close {
 
 .delete-btn {
     position: absolute;
-    top: 10px; /* Отступ сверху */
-    right: 10px; /* Отступ справа */
+    top: 0px; /* Отступ сверху */
+    right: 5px; /* Отступ справа */
     background: none; /* Без фона */
     border: none; /* Без рамки */
     color: #ff0000; /* Цвет крестика */
@@ -215,13 +215,13 @@ ul.messages li a.close {
     font-size: 20px;
 }
 
-.add-player-btn {
+.add-btn {
     display: inline-block;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     border-style: solid;
     border-width: 0.5px;
-    background-color: rgb(255, 251, 195);
+    background-color: rgb(159, 251, 251);
     padding: 0.3em;
 }
 

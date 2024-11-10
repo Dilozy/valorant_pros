@@ -1,13 +1,18 @@
-from rest_framework import mixins
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
-from pro_players.models import Player, Team
-from .serializers import PlayerSerializer, TeamSerializer, ExistingPlayerSerializer
-from .permissions import IsAdminOrReadOnly
+from pro_players.models import Player, Team, Comment, Highlight
+from .serializers import (
+    PlayerSerializer, TeamSerializer,
+    ExistingPlayerSerializer, CommentSerializer,
+    HighlightSerializer
+)
+from .permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
 
 
 class PlayersListPagination(PageNumberPagination):
@@ -39,12 +44,20 @@ class PlayersAPIList(generics.ListCreateAPIView):
     permission_classes = (IsAdminOrReadOnly, )
 
 
+class EradicatePlayerAPI(generics.RetrieveDestroyAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+    permission_class = (IsAdminUser, )
+
+
 class PlayerAPIDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     permission_classes = (IsAdminOrReadOnly, )
 
+
     def destroy(self, request, *args, **kwargs):
+        """Метод сбрасывает команду на значение null"""
         instance = self.get_object()
         instance.team = None
         instance.save()
@@ -57,70 +70,87 @@ class AddNewPlayerAPI(generics.ListCreateAPIView):
     serializer_class = PlayerSerializer
     permission_classes = (IsAdminUser, )
     
+
     def get_queryset(self):
         return Player.objects.filter(team=self.get_team())
 
+
     def get_team(self):
         team_name = self.kwargs.get("pk")
-        try:
-            return Team.objects.get(name=team_name)
-        except Team.DoesNotExist:
-            return None
+        return get_object_or_404(Team, name=team_name)
 
 
-    def post(self, request, *args, **kwargs):
-        team = self.get_team()
-
-        if team is None:
-            return Response({"error": "The team is not found"}, status=404)
-        
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(team=team)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    def perform_create(self, serializer):
+        serializer.save(team=self.get_team())
 
 
-class AddExistingPlayerAPI(mixins.ListModelMixin,
-                           generics.UpdateAPIView):
+class ListTeamlessPlayersAPI(generics.ListAPIView):
+    serializer_class = PlayerSerializer
+    queryset = Player.teamless.all()
+
+
+class AddExistingPlayerToTeamAPI(generics.UpdateAPIView):
     serializer_class = ExistingPlayerSerializer
-    permission_classes = (IsAdminUser, )
-    
-    def get_queryset(self):
-        return Player.objects.exclude(team=self.get_team())
+    permission_classes = (IsAdminUser,)
+
+    def get_object(self):
+        player_name = self.request.data.get("in_game_name")
+        player = get_object_or_404(Player, in_game_name=player_name)
+        return player
+
+    def update(self, request, *args, **kwargs):
+        player = self.get_object()
+        team = get_object_or_404(Team, name=self.kwargs.get("pk"))
+
+        player.team = team
+        player.save()
+
+        serializer = self.get_serializer(player, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-    def get(self, request, *args, **kwargs):
-        existing_players = self.get_queryset()
-        serializer = self.get_serializer(existing_players, many=True)
-
-        return Response(serializer.data, status=200)
+class CommentListCreateAPI(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
 
-    def get_team(self):
+    def dispatch(self, request, *args, **kwargs):
+        # Извлекаем команду один раз и сохраняем её как атрибут экземпляра
         team_name = self.kwargs.get("pk")
-        try:
-            return Team.objects.get(name=team_name)
-        except Team.DoesNotExist:
-            return None
+        self.team = get_object_or_404(Team, name=team_name)
+        return super().dispatch(request, *args, **kwargs)
 
 
-    def put(self, request, *args, **kwargs):
-        team = self.get_team()
-        
-        if team is None:
-            return Response({"error": "The team is not found"}, status=404)
-        
-        player_name = request.data.get("in_game_name")
-        if player_name is None:
-            return Response({"error": "Player ID is required"})
+    def get_queryset(self):
+        return Comment.objects.filter(team=self.team)
 
-        instance = Player.objects.get(in_game_name=player_name)
-        instance.team = team
-        instance.save()
 
-        serializer = self.get_serializer(instance=instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    def perform_create(self, serializer):
+        serializer.save(team=self.team, name=self.request.user.username)
+
+
+class CommentDetailsAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+    serializer_class = CommentSerializer
+
+
+class HighlightsListCreateAPI(generics.ListCreateAPIView):
+    serializer_class = HighlightSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+
+    def dispatch(self, request, *args, **kwargs):
+        player = get_object_or_404(Player, id=self.kwargs.get("pk"))
+        self.player = player
+        return super().dispatch(request, *args, **kwargs)
+
+
+    def get_queryset(self):
+        return Highlight.objects.filter(player=self.player)
+
+
+    def perform_create(self, serializer):
+        serializer.save(player=self.player)

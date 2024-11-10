@@ -16,7 +16,7 @@
     <div class="cards-container">
         {% for team in teams %}
         <div class="team-card">
-            {% if user.is_authenticated %}
+            {% if perms.pro_players.delete_team %}
             <form method="POST" action="{% url 'pro_players:delete_team' region team.slug %}">
                 <button class="delete-btn"
                     onclick="return confirm('Are you sure you want to delete this team?');">&times;</button>
@@ -32,6 +32,14 @@
             </div>
         {% endfor %}
     </div>
+
+    {% if perms.pro_players.add_team %}
+        <div class="add-btn">
+            <a href="{% url 'pro_players:add_team' region %}">
+                <p>Add a new team to the region</p>
+            </a>
+        </div>
+    {% endif %}
 {% endblock content %}
 
 

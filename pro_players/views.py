@@ -1,11 +1,10 @@
 from typing import Any
-from django.shortcuts import render
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse, reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views import generic
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -67,10 +66,11 @@ class TeamsInRegionView(generic.ListView):
         return context
 
 
-class AddTeamView(generic.CreateView):
+class AddTeamView(PermissionRequiredMixin, generic.CreateView):
     model = Team
     fields = ["name"]
     template_name = "teams/add_team.html"
+    permission_required = "pro_players.add_team"
 
 
     def get_context_data(self, **kwargs):
@@ -132,15 +132,13 @@ class PlayerDetailsView(generic.DetailView):
         return context
 
 
-class AddPlayerView(LoginRequiredMixin, generic.FormView):
+class AddPlayerView(PermissionRequiredMixin, generic.FormView):
     template_name = "players/add_player.html"
     form_class = NewPlayerForm
+    permission_required = "pro_players.add_player"
 
 
     def get_region_and_team(self):
-        """
-        Метод для получения региона и команды.
-        """
         region_name = self.kwargs.get("region")
         team_slug = self.kwargs.get("team_slug")
         region = get_object_or_404(Region, name=region_name)
@@ -167,7 +165,7 @@ class AddPlayerView(LoginRequiredMixin, generic.FormView):
             existing_player_form = ExistingPlayerForm(request.POST)
             if existing_player_form.is_valid():
                 return self.form_valid(existing_player_form)
-             
+     
 
     def get_success_url(self) -> str:
         region, team = self.get_region_and_team()
@@ -188,22 +186,11 @@ class AddPlayerView(LoginRequiredMixin, generic.FormView):
         return super().form_valid(form)
 
 
-    def form_invalid(self, form: Any) -> HttpResponse:
-        region, team = self.get_region_and_team()
-        # Передаем всю необходимую информацию в контекст
-        context = {
-            "form": form,
-            "existing_player_form": ExistingPlayerForm(),  # Если она необходима в контексте
-            "region": region.name,
-            "team_slug": team.slug
-        }
-        return render(self.request, self.template_name, context=context)
-
-
-class DeleteTeamView(LoginRequiredMixin, generic.DeleteView):
+class DeleteTeamView(PermissionRequiredMixin, generic.DeleteView):
     model = Team
     slug_url_kwarg = "team_slug"
     success_message = "The team has been deleted successfully"
+    permission_required = "pro_players.delete_team"
 
 
     def get_success_url(self) -> str:
@@ -211,41 +198,37 @@ class DeleteTeamView(LoginRequiredMixin, generic.DeleteView):
         return reverse("pro_players:teams", args=[self.kwargs.get("region")])
 
 
-class DeletePlayerFromTeamView(LoginRequiredMixin, generic.View):
+class RemovePlayerFromTeamView(PermissionRequiredMixin, generic.View):
     slug_url_kwarg = "player_slug"
     success_message = "The player has been removed from the team successfully"
+    permission_required = "pro_players.delete_player"
 
 
     def get_object(self):
-        """Получаем объект игрока по slug."""
         return Player.objects.get(slug=self.kwargs.get(self.slug_url_kwarg))
 
 
     def get_success_url(self):
-        """Возвращаем URL для перенаправления после успешного удаления."""
         return reverse("pro_players:team_players", args=[self.kwargs.get("region"), self.kwargs.get("team_slug")])
 
 
     def post(self, request, *args, **kwargs):
-        """Обрабатываем запрос на удаление игрока из команды."""
         player = self.get_object()
-        # Устанавливаем поле team в None
         player.team = None
-        player.save()  # Сохраняем изменения в базе данных
+        player.save()
 
-        # Отправляем сообщение об успехе
         messages.success(self.request, self.success_message)
         
-        # Перенаправляем на страницу команды
         return HttpResponseRedirect(self.get_success_url())
 
 
-class EditPlayerView(LoginRequiredMixin, generic.UpdateView):
+class EditPlayerView(PermissionRequiredMixin, generic.UpdateView):
     model = Player
     fields = ["full_name", "in_game_name", "in_game_role", "twitter_link", "twitch_link", "team"]
     template_name = "players/edit_player.html"
     slug_url_kwarg = "player_slug"
     success_message = "The player has been edited successfully"
+    permission_required = "pro_players.change_player"
 
 
     def get_success_url(self) -> str:
@@ -317,9 +300,10 @@ class SendEmailRecommendationView(LoginRequiredMixin, generic.FormView):
         return super().form_valid(form)
 
 
-class AddHighlightView(generic.FormView):
+class AddHighlightView(PermissionRequiredMixin, generic.FormView):
     form_class = AddHighlightForm
     template_name = "players/add_highlight.html"
+    permission_required = "pro_players.add_highlight"
 
 
     def get_success_url(self) -> str:
@@ -333,3 +317,10 @@ class AddHighlightView(generic.FormView):
         highlight.player = Player.objects.get(slug=self.kwargs.get("player_slug"))
         highlight.save()
         return super().form_valid(form)
+
+
+class EradicatePlayerView(PermissionRequiredMixin, generic.DeleteView):
+    model = Player
+    success_url = reverse_lazy("pro_players:all_players")
+    permission_required = "pro_players.delete_player"
+    slug_url_kwarg = "player_slug"

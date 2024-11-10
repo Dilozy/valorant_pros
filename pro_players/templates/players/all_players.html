@@ -20,9 +20,15 @@
         {% for player in page_obj.object_list %}
         {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
         <a href="{{ player.get_absolute_url }}?next={{ request.path }}">
-            <div class="player-card">
-                <img src="{% static image_path %}" alt="">
-                <p>{{ player.in_game_name }}</p>
+        <div class="player-card">
+            {% if perms.pro_players.delete_player %}
+            <form method="POST" action="{% url 'pro_players:eradicate_player' player.slug %}">
+                <button class="delete-btn" onclick="return confirm('Are you sure you want to eradicate this player?');">&times;</button>
+                {% csrf_token %}
+            </form>
+            {% endif %}
+            <img src="{% static image_path %}" alt="">
+            <p>{{ player.in_game_name }}</p>
             </div>
          </a>
         {% endwith %}

@@ -16,14 +16,15 @@
 <div class="cards-container">
     {% for player in players %}
     <div class="player-card">
-        {% if user.is_authenticated %}
-            <form method="POST" action="{% url 'pro_players:delete_player' region team.slug player.slug %}">
-                <button class="delete-btn" onclick="return confirm('Are you sure you want to delete this player?');">&times;</button>
-                {% csrf_token %}
-            </form>
-        {% endif %}
         {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
-            <a href="{{ player.get_absolute_url }}?next={{ request.path }}"><img src="{% static image_path %}" alt=""></a>
+        {% if perms.pro_players.delete_player %}
+        <form method="POST" action="{% url 'pro_players:remove_player' region team.slug player.slug %}">
+            <button class="delete-btn" onclick="return confirm('Are you sure you want to remove this player?');">&times;</button>
+            {% csrf_token %}
+        </form>
+        {% endif %}
+            <a href="{{ player.get_absolute_url }}?next={{ request.path }}">
+                <img src="{% static image_path %}" alt=""></a>
             <p>{{ player.in_game_name }}</p>
     </div>
     {% endwith %}
@@ -32,15 +33,11 @@
 {% endblock content %}
 
 {% block add_form %}
-    {% if request.user.is_staff %}
-        <div class="add-player-btn">
+    {% if perms.pro_players.add_player %}
+        <div class="add-btn">
             <a href="{% url 'pro_players:add_player_forms' region team.slug %}">
-                <p>Add player to the team</p>
+                <p>Add a new player to the team</p>
             </a>
-        </div>
-    {% else %}
-        <div class="login-required">
-            <h3>You need to <a href="{% url 'account:login' %}?next={{ request.path }}">log in</a> to be able to add players</h3>
         </div>
     {% endif %}
 {% endblock add_form %}
