@@ -4,6 +4,34 @@ info:
   version: 1.0.0
   description: A sample web application about pro Valorant players
 paths:
+  /api/v1/all-teams/:
+    get:
+      operationId: api_v1_all_teams_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: region
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTeamList'
+          description: ''
   /api/v1/auth/token/login/:
     post:
       operationId: api_v1_auth_token_login_create
@@ -513,9 +541,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/SetUsername'
           description: ''
-  /api/v1/player/{id}/:
+  /api/v1/comments/{id}/details/:
     get:
-      operationId: api_v1_player_retrieve
+      operationId: api_v1_comments_details_retrieve
       parameters:
       - in: path
         name: id
@@ -533,10 +561,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/Comment'
           description: ''
     put:
-      operationId: api_v1_player_update
+      operationId: api_v1_comments_details_update
       parameters:
       - in: path
         name: id
@@ -549,13 +577,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Player'
+              $ref: '#/components/schemas/Comment'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Player'
+              $ref: '#/components/schemas/Comment'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Player'
+              $ref: '#/components/schemas/Comment'
         required: true
       security:
       - tokenAuth: []
@@ -566,10 +594,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/Comment'
           description: ''
     patch:
-      operationId: api_v1_player_partial_update
+      operationId: api_v1_comments_details_partial_update
       parameters:
       - in: path
         name: id
@@ -582,13 +610,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedPlayer'
+              $ref: '#/components/schemas/PatchedComment'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedPlayer'
+              $ref: '#/components/schemas/PatchedComment'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedPlayer'
+              $ref: '#/components/schemas/PatchedComment'
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -598,10 +626,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/Comment'
           description: ''
     delete:
-      operationId: api_v1_player_destroy
+      operationId: api_v1_comments_details_destroy
       parameters:
       - in: path
         name: id
@@ -617,9 +645,9 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/v1/players-list/:
+  /api/v1/players/:
     get:
-      operationId: api_v1_players_list_list
+      operationId: api_v1_players_list
       parameters:
       - name: page
         required: false
@@ -643,7 +671,7 @@ paths:
         name: team
         schema:
           type: string
-          title: Team_name
+          title: Team name
       tags:
       - api
       security:
@@ -658,7 +686,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedPlayerList'
           description: ''
     post:
-      operationId: api_v1_players_list_create
+      operationId: api_v1_players_create
       tags:
       - api
       requestBody:
@@ -684,16 +712,522 @@ paths:
               schema:
                 $ref: '#/components/schemas/Player'
           description: ''
-  /api/v1/team/{name}/:
+  /api/v1/players/{id}/:
     get:
-      operationId: api_v1_team_retrieve
+      operationId: api_v1_players_retrieve
       parameters:
       - in: path
-        name: name
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    put:
+      operationId: api_v1_players_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Player'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Player'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    patch:
+      operationId: api_v1_players_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlayer'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    delete:
+      operationId: api_v1_players_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/players/{id}/eradicate/:
+    get:
+      operationId: api_v1_players_eradicate_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+    delete:
+      operationId: api_v1_players_eradicate_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/players/{id}/highlights/:
+    get:
+      operationId: api_v1_players_highlights_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHighlightList'
+          description: ''
+    post:
+      operationId: api_v1_players_highlights_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Highlight'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Highlight'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Highlight'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Highlight'
+          description: ''
+  /api/v1/players/teamless/:
+    get:
+      operationId: api_v1_players_teamless_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlayerList'
+          description: ''
+  /api/v1/regions/:
+    get:
+      operationId: api_v1_regions_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRegionList'
+          description: ''
+  /api/v1/regions/{id}/teams/:
+    get:
+      operationId: api_v1_regions_teams_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTeamList'
+          description: ''
+    post:
+      operationId: api_v1_regions_teams_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Team'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Team'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+  /api/v1/regions/{id}/teams/{id}/comments/:
+    get:
+      operationId: api_v1_regions_teams_comments_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
+    post:
+      operationId: api_v1_regions_teams_comments_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/regions/{id}/teams/{id}/existing-player/:
+    put:
+      operationId: api_v1_regions_teams_existing_player_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExistingPlayer'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExistingPlayer'
+          description: ''
+    patch:
+      operationId: api_v1_regions_teams_existing_player_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExistingPlayer'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExistingPlayer'
+          description: ''
+  /api/v1/regions/{id}/teams/{id}/new-player/:
+    get:
+      operationId: api_v1_regions_teams_new_player_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlayerList'
+          description: ''
+    post:
+      operationId: api_v1_regions_teams_new_player_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Player'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Player'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+          description: ''
+  /api/v1/regions/{id}/teams/{team_pk}/:
+    get:
+      operationId: api_v1_regions_teams_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: team_pk
         schema:
           type: string
-          title: Team_name
-        description: A unique value identifying this team.
         required: true
       tags:
       - api
@@ -709,14 +1243,17 @@ paths:
                 $ref: '#/components/schemas/Team'
           description: ''
     put:
-      operationId: api_v1_team_update
+      operationId: api_v1_regions_teams_update
       parameters:
       - in: path
-        name: name
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: team_pk
         schema:
           type: string
-          title: Team_name
-        description: A unique value identifying this team.
         required: true
       tags:
       - api
@@ -744,14 +1281,17 @@ paths:
                 $ref: '#/components/schemas/Team'
           description: ''
     patch:
-      operationId: api_v1_team_partial_update
+      operationId: api_v1_regions_teams_partial_update
       parameters:
       - in: path
-        name: name
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: team_pk
         schema:
           type: string
-          title: Team_name
-        description: A unique value identifying this team.
         required: true
       tags:
       - api
@@ -778,14 +1318,17 @@ paths:
                 $ref: '#/components/schemas/Team'
           description: ''
     delete:
-      operationId: api_v1_team_destroy
+      operationId: api_v1_regions_teams_destroy
       parameters:
       - in: path
-        name: name
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: team_pk
         schema:
           type: string
-          title: Team_name
-        description: A unique value identifying this team.
         required: true
       tags:
       - api
@@ -796,174 +1339,126 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/v1/team/{id}/add-existing-player:
+  /api/v1/schema/:
     get:
-      operationId: api_v1_team_add_existing_player_list
+      operationId: api_v1_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
       parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedExistingPlayerList'
-          description: ''
-    put:
-      operationId: api_v1_team_add_existing_player_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ExistingPlayer'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ExistingPlayer'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/ExistingPlayer'
-        required: true
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExistingPlayer'
-          description: ''
-    patch:
-      operationId: api_v1_team_add_existing_player_partial_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedExistingPlayer'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedExistingPlayer'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedExistingPlayer'
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExistingPlayer'
-          description: ''
-  /api/v1/team/{id}/add-new-player:
-    get:
-      operationId: api_v1_team_add_new_player_list
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedPlayerList'
-          description: ''
-    post:
-      operationId: api_v1_team_add_new_player_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Player'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Player'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Player'
-        required: true
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Player'
-          description: ''
-  /api/v1/teams-list/:
-    get:
-      operationId: api_v1_teams_list_list
-      parameters:
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       - in: query
-        name: region
+        name: format
         schema:
           type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
       tags:
       - api
       security:
@@ -974,9 +1469,22 @@ paths:
       responses:
         '200':
           content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTeamList'
+                type: object
+                additionalProperties: {}
           description: ''
 components:
   schemas:
@@ -990,9 +1498,46 @@ components:
       required:
       - token
       - uid
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        body:
+          type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated:
+          type: string
+          format: date-time
+          readOnly: true
+        active:
+          type: boolean
+          readOnly: true
+        team:
+          type: string
+          title: Team name
+          readOnly: true
+      required:
+      - active
+      - body
+      - created
+      - id
+      - name
+      - team
+      - updated
     ExistingPlayer:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         full_name:
           type: string
           readOnly: true
@@ -1004,8 +1549,7 @@ components:
           title: Role
         team:
           type: string
-          title: Team_name
-          readOnly: true
+          title: Team name
           nullable: true
         twitter_link:
           type: string
@@ -1021,156 +1565,157 @@ components:
           title: Twitch
       required:
       - full_name
+      - id
       - in_game_name
       - in_game_role
-      - team
       - twitch_link
       - twitter_link
+    Highlight:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        video_title:
+          type: string
+          maxLength: 100
+        video_url:
+          type: string
+          maxLength: 150
+        player:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - id
+      - player
+      - video_title
+      - video_url
     InGameNameEnum:
       enum:
-      - Enzo
-      - Mistic
-      - Demon1
-      - aspas
-      - Xeppaa
-      - OXY
-      - sdfsdf
-      - dfgdfg
-      - www
-      - fefefef
-      - wwwww
-      - ttttt
-      - nAts
-      - Jamppi
-      - Keiko
-      - QutionerX
-      - Brave
-      - Elite
-      - pAura
-      - reazy
-      - Boaster
-      - Derke
-      - Alfajer
-      - Chronicle
-      - hiro
-      - Boo
-      - benjyfishy
-      - MiniBoo
-      - RieNs
-      - Wo0t
-      - MrFaliN
-      - qRaxs
-      - ATA KAPTAN
-      - yetujey
-      - cNed
-      - Shin
-      - Magnum
-      - marteen
-      - N4RRATE
-      - tomaszy
-      - ANGE1
-      - SUYGETSU
-      - Shao
-      - Zyppan
-      - ardiis
-      - beyAz
-      - nataNk
-      - TakaS
-      - Wailers
-      - kAdavra
-      - ceNder
-      - runneR
-      - Kicks
-      - Sayf
-      - trexx
-      - Cloud
-      - hoody
-      - Fit1nho
-      - purp0
-      - Famsii
-      - Sheydos
-      - starxo
-      - GRUBINHO
-      - kamo
-      - ShadoW
       - kaajak
       - AvovA
       - hype
       - MOLSI
       - soulcas
+      - QutionerX
+      - Elite
+      - pAura
+      - reazy
+      - Ffffee
+      - Boaster
+      - Derke
+      - Alfajer
+      - Chronicle
+      - hiro
+      - MrFaliN
+      - qRaxs
+      - ATA KAPTAN
+      - yetujey
+      - cNed
+      - beyAz
+      - nataNk
+      - TakaS
+      - Wailers
+      - kAdavra
+      - Cloud
+      - hoody
+      - Fit1nho
+      - purp0
+      - Famsii
+      - Shin
+      - Magnum
+      - marteen
+      - N4RRATE
+      - tomaszy
+      - Sheydos
+      - starxo
+      - GRUBINHO
+      - kamo
+      - ShadoW
+      - nAts
+      - Jamppi
+      - Keiko
+      - Demon1
+      - ANGE1
+      - SUYGETSU
+      - Shao
+      - Zyppan
+      - ardiis
+      - Boo
+      - benjyfishy
+      - MiniBoo
+      - RieNs
+      - Wo0t
+      - ceNder
+      - runneR
+      - Kicks
+      - Sayf
+      - trexx
+      - bang
       type: string
       description: |-
-        * `Enzo` - Enzo
-        * `Mistic` - Mistic
-        * `Demon1` - Demon1
-        * `aspas` - aspas
-        * `Xeppaa` - Xeppaa
-        * `OXY` - OXY
-        * `sdfsdf` - sdfsdf
-        * `dfgdfg` - dfgdfg
-        * `www` - www
-        * `fefefef` - fefefef
-        * `wwwww` - wwwww
-        * `ttttt` - ttttt
-        * `nAts` - nAts
-        * `Jamppi` - Jamppi
-        * `Keiko` - Keiko
-        * `QutionerX` - QutionerX
-        * `Brave` - Brave
-        * `Elite` - Elite
-        * `pAura` - pAura
-        * `reazy` - reazy
-        * `Boaster` - Boaster
-        * `Derke` - Derke
-        * `Alfajer` - Alfajer
-        * `Chronicle` - Chronicle
-        * `hiro` - hiro
-        * `Boo` - Boo
-        * `benjyfishy` - benjyfishy
-        * `MiniBoo` - MiniBoo
-        * `RieNs` - RieNs
-        * `Wo0t` - Wo0t
-        * `MrFaliN` - MrFaliN
-        * `qRaxs` - qRaxs
-        * `ATA KAPTAN` - ATA KAPTAN
-        * `yetujey` - yetujey
-        * `cNed` - cNed
-        * `Shin` - Shin
-        * `Magnum` - Magnum
-        * `marteen` - marteen
-        * `N4RRATE` - N4RRATE
-        * `tomaszy` - tomaszy
-        * `ANGE1` - ANGE1
-        * `SUYGETSU` - SUYGETSU
-        * `Shao` - Shao
-        * `Zyppan` - Zyppan
-        * `ardiis` - ardiis
-        * `beyAz` - beyAz
-        * `nataNk` - nataNk
-        * `TakaS` - TakaS
-        * `Wailers` - Wailers
-        * `kAdavra` - kAdavra
-        * `ceNder` - ceNder
-        * `runneR` - runneR
-        * `Kicks` - Kicks
-        * `Sayf` - Sayf
-        * `trexx` - trexx
-        * `Cloud` - Cloud
-        * `hoody` - hoody
-        * `Fit1nho` - Fit1nho
-        * `purp0` - purp0
-        * `Famsii` - Famsii
-        * `Sheydos` - Sheydos
-        * `starxo` - starxo
-        * `GRUBINHO` - GRUBINHO
-        * `kamo` - kamo
-        * `ShadoW` - ShadoW
         * `kaajak` - kaajak
         * `AvovA` - AvovA
         * `hype` - hype
         * `MOLSI` - MOLSI
         * `soulcas` - soulcas
-    PaginatedExistingPlayerList:
+        * `QutionerX` - QutionerX
+        * `Elite` - Elite
+        * `pAura` - pAura
+        * `reazy` - reazy
+        * `Ffffee` - Ffffee
+        * `Boaster` - Boaster
+        * `Derke` - Derke
+        * `Alfajer` - Alfajer
+        * `Chronicle` - Chronicle
+        * `hiro` - hiro
+        * `MrFaliN` - MrFaliN
+        * `qRaxs` - qRaxs
+        * `ATA KAPTAN` - ATA KAPTAN
+        * `yetujey` - yetujey
+        * `cNed` - cNed
+        * `beyAz` - beyAz
+        * `nataNk` - nataNk
+        * `TakaS` - TakaS
+        * `Wailers` - Wailers
+        * `kAdavra` - kAdavra
+        * `Cloud` - Cloud
+        * `hoody` - hoody
+        * `Fit1nho` - Fit1nho
+        * `purp0` - purp0
+        * `Famsii` - Famsii
+        * `Shin` - Shin
+        * `Magnum` - Magnum
+        * `marteen` - marteen
+        * `N4RRATE` - N4RRATE
+        * `tomaszy` - tomaszy
+        * `Sheydos` - Sheydos
+        * `starxo` - starxo
+        * `GRUBINHO` - GRUBINHO
+        * `kamo` - kamo
+        * `ShadoW` - ShadoW
+        * `nAts` - nAts
+        * `Jamppi` - Jamppi
+        * `Keiko` - Keiko
+        * `Demon1` - Demon1
+        * `ANGE1` - ANGE1
+        * `SUYGETSU` - SUYGETSU
+        * `Shao` - Shao
+        * `Zyppan` - Zyppan
+        * `ardiis` - ardiis
+        * `Boo` - Boo
+        * `benjyfishy` - benjyfishy
+        * `MiniBoo` - MiniBoo
+        * `RieNs` - RieNs
+        * `Wo0t` - Wo0t
+        * `ceNder` - ceNder
+        * `runneR` - runneR
+        * `Kicks` - Kicks
+        * `Sayf` - Sayf
+        * `trexx` - trexx
+        * `bang` - bang
+    PaginatedCommentList:
       type: object
       required:
       - count
@@ -1192,7 +1737,30 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ExistingPlayer'
+            $ref: '#/components/schemas/Comment'
+    PaginatedHighlightList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Highlight'
     PaginatedPlayerList:
       type: object
       required:
@@ -1216,6 +1784,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Player'
+    PaginatedRegionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Region'
     PaginatedTeamList:
       type: object
       required:
@@ -1275,9 +1866,38 @@ components:
       - new_password
       - token
       - uid
+    PatchedComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        body:
+          type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated:
+          type: string
+          format: date-time
+          readOnly: true
+        active:
+          type: boolean
+          readOnly: true
+        team:
+          type: string
+          title: Team name
+          readOnly: true
     PatchedExistingPlayer:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         full_name:
           type: string
           readOnly: true
@@ -1289,8 +1909,7 @@ components:
           title: Role
         team:
           type: string
-          title: Team_name
-          readOnly: true
+          title: Team name
           nullable: true
         twitter_link:
           type: string
@@ -1307,21 +1926,24 @@ components:
     PatchedPlayer:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         full_name:
           type: string
           maxLength: 255
         in_game_name:
           type: string
-          title: Name
           maxLength: 50
+        team:
+          type: string
+          title: Team name
+          readOnly: true
+          nullable: true
         in_game_role:
           type: string
           title: Role
           maxLength: 15
-        team:
-          type: string
-          title: Team_name
-          nullable: true
         twitter_link:
           type: string
           format: uri
@@ -1339,11 +1961,11 @@ components:
       properties:
         name:
           type: string
-          title: Team_name
+          title: Team name
           maxLength: 20
         region:
-          type: string
-          maxLength: 10
+          type: integer
+          readOnly: true
         players:
           type: array
           items:
@@ -1368,21 +1990,24 @@ components:
     Player:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         full_name:
           type: string
           maxLength: 255
         in_game_name:
           type: string
-          title: Name
           maxLength: 50
+        team:
+          type: string
+          title: Team name
+          readOnly: true
+          nullable: true
         in_game_role:
           type: string
           title: Role
           maxLength: 15
-        team:
-          type: string
-          title: Team_name
-          nullable: true
         twitter_link:
           type: string
           format: uri
@@ -1397,8 +2022,23 @@ components:
           maxLength: 200
       required:
       - full_name
+      - id
       - in_game_name
       - in_game_role
+      - team
+    Region:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Region name
+          maxLength: 10
+      required:
+      - id
+      - name
     SendEmailReset:
       type: object
       properties:
@@ -1437,11 +2077,11 @@ components:
       properties:
         name:
           type: string
-          title: Team_name
+          title: Team name
           maxLength: 20
         region:
-          type: string
-          maxLength: 10
+          type: integer
+          readOnly: true
         players:
           type: array
           items:
