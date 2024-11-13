@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0t(!ob9-91h-akn_t0$sigf+v4o90op_jp0^a34=b8v)guy=+i'
+SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,11 +81,24 @@ TEMPLATES = [
 ]
 
 
+# OAuth 2.0 settings
+
 AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.twitch.TwitchOAuth2',
 ]
+
+SOCIAL_AUTH_TWITCH_KEY = getenv('SOCIAL_AUTH_TWITCH_KEY')
+SOCIAL_AUTH_TWITCH_SECRET = getenv('SOCIAL_AUTH_TWITCH_SECRET')
+
+SOCIAL_AUTH_TWITCH_SCOPE = ['user:read:email', 'user:read:subscriptions']
+
+
+# Login settings
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+
 
 WSGI_APPLICATION = 'ValorantPros.wsgi.application'
 
@@ -149,29 +162,25 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email server configuration
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'denisfilippov964@gmail.com'
-EMAIL_HOST_PASSWORD = 'wrrp inje bfgn mbxn'
-EMAIL_PORT = 587
+# Email SMTP server configuration
+EMAIL_HOST = getenv('EMAIL_HOST')
+EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = getenv('EMAIL_PORT')
 EMAIL_USE_TLS = True
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/'
 
+# Sessions settings
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
+# Media files settings
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
-
-SOCIAL_AUTH_TWITCH_KEY = 'ebjr7onz0he5r7z11f2pts4zff9wk7'
-SOCIAL_AUTH_TWITCH_SECRET = 'yu5aai8j2rci4od0fa13m6zh5h3wrr'
-
-SOCIAL_AUTH_TWITCH_SCOPE = ['user:read:email', 'user:read:subscriptions']
+# REST Framework settings
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -189,9 +198,10 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# DRF-Spectacular settings
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "ValorantPros API Project",
     "DESCRIPTION": "A sample web application about pro Valorant players",
     "VERSION": "1.0.0",
-    # OTHER SETTINGS
 }
