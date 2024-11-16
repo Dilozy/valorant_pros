@@ -39,7 +39,7 @@
                 </span>
             </div>
             {% endif %}
-            {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+            {% with image_path="pictures/"|add:player.in_game_name|lower|add:".jpg" %}
                 <img src="{% static image_path %}" alt="">
             {% endwith %}
             <p>Full name: {{ player.full_name }}</p>

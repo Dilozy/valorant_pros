@@ -16,7 +16,7 @@
 <div class="cards-container">
     {% for player in players %}
     <div class="player-card">
-        {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+        {% with image_path="pictures/"|add:player.in_game_name|lower|add:".jpg" %}
         {% if perms.pro_players.delete_player %}
         <form method="POST" action="{% url 'pro_players:remove_player' region team.slug player.slug %}">
             <button class="delete-btn" onclick="return confirm('Are you sure you want to remove this player?');">&times;</button>

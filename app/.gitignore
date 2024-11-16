@@ -12,5 +12,6 @@ staticfiles/
 media/
 site_data_copy.json
 site_data.json
+/static/
 
 profile_images/

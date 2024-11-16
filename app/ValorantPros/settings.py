@@ -15,6 +15,8 @@ from pathlib import Path
 import sys
 
 
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -68,7 +70,7 @@ ROOT_URLCONF = 'ValorantPros.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,7 +82,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 # OAuth 2.0 settings
 
@@ -107,15 +108,26 @@ WSGI_APPLICATION = 'ValorantPros.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-load_dotenv()
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': getenv('DB_NAME'),
+            'USER': getenv('DB_USER'),
+            'PASSWORD': getenv('DB_PASSWORD'),
+            'HOST': 'localhost',
+            'PORT': getenv('DB_PORT', '3306')
+        }
+    }
 
-DATABASES = {
+else:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': getenv('DB_NAME'),
         'USER': getenv('DB_USER'),
         'PASSWORD': getenv('DB_PASSWORD'),
-        'HOST': getenv('DB_HOST', 'localhost'),
+        'HOST': getenv('DB_HOST'),
         'PORT': getenv('DB_PORT', '3306')
     }
 }
@@ -155,12 +167,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
 STATIC_URL = '/static/'
 
-if sys.argv[1] == 'runserver':
-    STATICFILES_DIRS = [path.join(BASE_DIR, 'static'),]
+if 'runserver' in sys.argv:
+    STATICFILES_DIRS = [path.join(BASE_DIR, 'static')]
 else:
-    STATIC_ROOT = path.join(BASE_DIR, 'static')
+    STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

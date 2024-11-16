@@ -18,7 +18,7 @@
     
     <div class="cards-container">
         {% for player in page_obj.object_list %}
-        {% with image_path="pictures/"|add:player.in_game_name|add:".jpg" %}
+        {% with image_path="pictures/"|add:player.in_game_name|lower|add:".jpg" %}
         <a href="{{ player.get_absolute_url }}?next={{ request.path }}">
         <div class="player-card">
             {% if perms.pro_players.delete_player %}
