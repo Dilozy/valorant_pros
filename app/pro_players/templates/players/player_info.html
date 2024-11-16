@@ -57,7 +57,6 @@
     </div>
     <h2>Highlights</h2>
     {% include "players/player_highlights.html" %}
-    {% endblock content %}
     {% if perms.pro_players.add_highlight %}
     <div class="add-btn">
         <a href="{% url 'pro_players:add_highlight' player.slug %}">
@@ -65,5 +64,6 @@
         </a>
     </div>
     {% endif %}
+    {% endblock content %}
 </body>
 </html>
