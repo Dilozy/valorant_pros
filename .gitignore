@@ -1,0 +1,16 @@
+__pycache__/
+.env
+cert.crt
+cert.key
+.venv
+# Базы данных
+*.sqlite3
+
+*/migrations/*
+
+staticfiles/
+media/
+db.json
+static/
+profile_images/
+

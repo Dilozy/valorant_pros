@@ -9,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'styles/player.css' %}">
 </head>
 <body>
-    {% block content %}
     <div class="go-back-button">
         <a href="{{ go_back_link }}"><button>&larr; Back</button></a>
     </div>
@@ -29,7 +28,7 @@
         {% endfor %}
       </ul>
     {% endif %}
-
+    {% block content %}
     <div class="player-details-container">
         <div class="player-details-card">
             {% if perms.pro_players.change_player %}
@@ -56,17 +55,15 @@
         
         </div>
     </div>
-    {% endblock content %}
     <h2>Highlights</h2>
     {% include "players/player_highlights.html" %}
-
+    {% endblock content %}
     {% if perms.pro_players.add_highlight %}
-        <div class="add-btn">
-            <a href="{% url 'pro_players:add_highlight' player.slug %}">
-                <p>Add a new highlight for this player</p>
-            </a>
-        </div>
+    <div class="add-btn">
+        <a href="{% url 'pro_players:add_highlight' player.slug %}">
+            <p>Add a new highlight for this player</p>
+        </a>
+    </div>
     {% endif %}
-
 </body>
 </html>

@@ -10,9 +10,9 @@ if ! python manage.py showmigrations | grep -q ' [ ]'; then
 fi
 
 # Загружаем данные, если это не было сделано
-if ! python manage.py loaddata site_data_latest_encoded.json; then
+if ! python manage.py loaddata db.json; then
   echo "Loading fixture..."
-  python -Xutf8 manage.py loaddata site_data_latest_encoded.json
+  python -Xutf8 manage.py loaddata db.json
 fi
 
 
