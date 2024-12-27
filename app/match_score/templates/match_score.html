@@ -1,0 +1,60 @@
+<div class="match-score-container">
+    <h2>Live Match Score</h2>
+    <div id="match-info">
+        <p>Fetching live match data...</p>
+    </div>
+</div>
+
+<script>
+    // Настраиваем WebSocket-соединение
+    const targetTeamSlug = "{{ target_team_slug }}"; // Имя команды можно передать из представления
+    console.log(`WebSocket URL: ws://${window.location.host}/ws/match/${targetTeamSlug}/`);
+    const ws = new WebSocket(`ws://${window.location.host}/ws/match/${targetTeamSlug}/`);
+
+
+    // Когда WebSocket-соединение установлено, можно отправить данные
+    ws.onopen = function() {
+        console.log("WebSocket connection established");
+
+        // Пример отправки сообщения на сервер
+        const message = {
+            team_slug: targetTeamSlug  // Данные, которые клиент хочет отправить
+        };
+        ws.send(JSON.stringify(message)); // Отправка данных на сервер
+    };
+
+    // Обработка сообщений от WebSocket
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("Received data:", data); // Выводим полученные данные в консоль для отладки
+
+
+        // Если статус успешный, обновляем данные матча
+        if (data.status === "success") {
+            document.getElementById("match-info").innerHTML = `
+                <h3>${data.match_event}</h3>
+                <p><strong>${data.team1}</strong>: ${data.team1_score} (${data.team1_current_map_score} on current map)</p>
+                <p><strong>${data.team2}</strong>: ${data.team2_score} (${data.team2_current_map_score} on current map)</p>
+            `;
+        } else {
+            // Если ошибка, отображаем сообщение об ошибке
+            document.getElementById("match-info").innerHTML = `
+                <p>${data.status}</p>
+            `;
+        }
+    };
+
+    // Обработка ошибок WebSocket
+    ws.onerror = function() {
+        document.getElementById("match-info").innerHTML = `
+            <p>Failed to fetch match data. Please try again later.</p>
+        `;
+    };
+
+    // Закрытие WebSocket-соединения
+    ws.onclose = function() {
+        document.getElementById("match-info").innerHTML = `
+            <p>Connection closed. Please refresh the page to reconnect.</p>
+        `;
+    };
+</script>

@@ -2,8 +2,8 @@ services:
   app:
     build: ./app
         # Запускаем сервер Gunicorn
-    command: gunicorn ValorantPros.wsgi:application --bind 0.0.0.0:8000
-    container_name: valorant_pros_app
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    container_name: web_app
     ports:
       - 127.0.0.1:8000:8000
     depends_on:
@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - static-data:/app/staticfiles
+      - .:/usr/src/app/
 
   db:
     image: mysql
@@ -31,6 +32,7 @@ services:
 
   nginx:
     build: ./nginx
+    container_name: nginx
     ports:
       - 80:80
     depends_on:
@@ -38,9 +40,42 @@ services:
     volumes:
       - static-data:/app/staticfiles
 
+  rabbitmq:
+    image: rabbitmq
+    hostname: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ./rabbitmq-config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    env_file:
+      - .env
+
+  worker:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile.worker
+    hostname: worker
+    command: celery -A core worker --loglevel=info
+    container_name: celery_worker
+    depends_on:
+      - rabbitmq
+      - db
+      - redis
+    env_file:
+      - .env
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    container_name: redis
+
 volumes:
   mysql-data:
   static-data:
+
 
 
   

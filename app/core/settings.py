@@ -9,10 +9,11 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-from os import getenv, path
-from dotenv import load_dotenv
-from pathlib import Path
 import sys
+from os import getenv, path
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 load_dotenv()
@@ -37,6 +38,7 @@ ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS').split()
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'account.apps.AccountConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,7 +54,8 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework.authtoken',
     'djoser',
-    'drf_spectacular'
+    'drf_spectacular',
+    'match_score',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ValorantPros.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -102,7 +105,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 
 
-WSGI_APPLICATION = 'ValorantPros.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 
 # Database
@@ -175,12 +179,14 @@ if 'runserver' in sys.argv:
 else:
     STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email SMTP server configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = getenv('EMAIL_HOST')
 EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
@@ -223,3 +229,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "A sample web application about pro Valorant players",
     "VERSION": "1.0.0",
 }
+
+# Celery settings
+
+RABBITMQ_USER = getenv('RABBIT_USER')
+RABBITMQ_PW = getenv('RABBIT_PW')
+CELERY_BROKER_URL = f'amqp://{RABBITMQ_USER}:{RABBITMQ_PW}@rabbitmq:5672/'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'

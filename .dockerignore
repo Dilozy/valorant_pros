@@ -7,9 +7,4 @@ __pycache__
 *.db
 *.sqlite3
 *.log
-*.env
 *.bak
-
-# Игнорировать специфичные для Docker файлы
-Dockerfile
-docker-compose.yml

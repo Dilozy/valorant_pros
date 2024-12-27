@@ -1,4 +1,5 @@
 from typing import Any
+
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.utils.decorators import method_decorator
@@ -9,7 +10,7 @@ from django.views import generic
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
+
 from .models import Comment, Team, Player, Region
 from .forms import (
     EmailRecommendationForm, NewPlayerForm,
@@ -18,6 +19,7 @@ from .forms import (
     )
 from .filters import PlayersFilter
 from .services import URL_to_ID
+from .tasks import send_email_notification
 
 
 class HomePageView(generic.TemplateView):
@@ -29,14 +31,12 @@ class AllPlayersList(generic.ListView):
     template_name = "players/all_players.html"
     paginate_by = 9
 
-
     def get_queryset(self) -> QuerySet[Any]:
         if self.request.GET.get("has_team") == "True":
             return Player.has_team.all()
         if self.request.GET.get("has_team") == "False":
             return Player.teamless.all()
         return Player.objects.all()
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,12 +52,10 @@ class TeamsInRegionView(generic.ListView):
     template_name = "teams/region_teams.html"
     context_object_name = "teams"
 
-
     def get_queryset(self):
         self.region = get_object_or_404(Region, name=self.kwargs.get("region"))
         print(self.region)
         return self.region.team_set.all()
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,16 +70,13 @@ class AddTeamView(PermissionRequiredMixin, generic.CreateView):
     template_name = "teams/add_team.html"
     permission_required = "pro_players.add_team"
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["region"] = self.kwargs.get("region")
         return context
 
-
     def get_success_url(self) -> str:
         return reverse("pro_players:teams", args=[self.kwargs.get("region")])
-
 
     def form_valid(self, form):
         team = form.save(commit=False)
@@ -95,7 +90,6 @@ class TeamDetailsView(generic.ListView):
     context_object_name = "players"
     template_name = "teams/team_players.html"
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["region"] = self.kwargs.get("region")
@@ -103,7 +97,6 @@ class TeamDetailsView(generic.ListView):
         context["form"] = CommentForm()
         context["comments"] = context["team"].comments.filter(active=True)
         return context
-
 
     def get_queryset(self):
         team = get_object_or_404(Team, slug=self.kwargs.get("team_slug"))
@@ -116,7 +109,6 @@ class PlayerDetailsView(generic.DetailView):
     template_name = "players/player_info.html"
     slug_url_kwarg = "player_slug"
     context_object_name = "player"
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,14 +129,12 @@ class AddPlayerView(PermissionRequiredMixin, generic.FormView):
     form_class = NewPlayerForm
     permission_required = "pro_players.add_player"
 
-
     def get_region_and_team(self):
         region_name = self.kwargs.get("region")
         team_slug = self.kwargs.get("team_slug")
         region = get_object_or_404(Region, name=region_name)
         team = get_object_or_404(Team, slug=team_slug)
         return region, team
-
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         region, team = self.get_region_and_team()
@@ -153,7 +143,6 @@ class AddPlayerView(PermissionRequiredMixin, generic.FormView):
         context["region"] = region.name
         context["team_slug"] = team.slug
         return context
-
 
     def post(self, request, *args, **kwargs):
         if request.POST.get("form_type") == "new_player":
@@ -166,12 +155,10 @@ class AddPlayerView(PermissionRequiredMixin, generic.FormView):
             if existing_player_form.is_valid():
                 return self.form_valid(existing_player_form)
      
-
     def get_success_url(self) -> str:
         region, team = self.get_region_and_team()
         return reverse("pro_players:team_players", args=[region.name,
                                                          team.slug])
-
 
     def form_valid(self, form):
         _, team = self.get_region_and_team()
@@ -185,13 +172,11 @@ class AddPlayerView(PermissionRequiredMixin, generic.FormView):
         messages.success(self.request, f"Игрок {player.in_game_name} успешно добавлен в команду")
         return super().form_valid(form)
 
-
 class DeleteTeamView(PermissionRequiredMixin, generic.DeleteView):
     model = Team
     slug_url_kwarg = "team_slug"
     success_message = "The team has been deleted successfully"
     permission_required = "pro_players.delete_team"
-
 
     def get_success_url(self) -> str:
         messages.success(self.request, self.success_message)
@@ -203,14 +188,11 @@ class RemovePlayerFromTeamView(PermissionRequiredMixin, generic.View):
     success_message = "The player has been removed from the team successfully"
     permission_required = "pro_players.delete_player"
 
-
     def get_object(self):
         return Player.objects.get(slug=self.kwargs.get(self.slug_url_kwarg))
 
-
     def get_success_url(self):
         return reverse("pro_players:team_players", args=[self.kwargs.get("region"), self.kwargs.get("team_slug")])
-
 
     def post(self, request, *args, **kwargs):
         player = self.get_object()
@@ -230,7 +212,6 @@ class EditPlayerView(PermissionRequiredMixin, generic.UpdateView):
     success_message = "The player has been edited successfully"
     permission_required = "pro_players.change_player"
 
-
     def get_success_url(self) -> str:
         messages.success(self.request, self.success_message)
         return reverse("pro_players:player_info", args=[self.kwargs.get("player_slug")])
@@ -242,7 +223,6 @@ class PostTeamCommentView(LoginRequiredMixin, generic.CreateView):
     fields = ["body"]
     template_name = "utils/comment_form.html"
 
-
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["team"] = get_object_or_404(Team,
@@ -251,12 +231,10 @@ class PostTeamCommentView(LoginRequiredMixin, generic.CreateView):
         context["comment"] = None
         return context
 
-
     def get_success_url(self) -> str:
         messages.success(self.request, "Your comment has been added")
         return reverse("pro_players:team_players", args=[self.kwargs.get("region"),
                                                          self.kwargs.get("team_slug")])
-
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         comment = form.save(commit=False)
@@ -271,16 +249,13 @@ class SendEmailRecommendationView(LoginRequiredMixin, generic.FormView):
     form_class = EmailRecommendationForm
     extra_context = {"sent": False}
 
-    
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["player"] = get_object_or_404(Player, slug=self.kwargs.get("player_slug"))
         return context
 
-
     def get_success_url(self) -> str:
         return reverse("pro_players:send_email_recommendation", args=[self.kwargs.get("player_slug")])
-
 
     def form_valid(self, form):
         player = self.get_context_data()["player"]
@@ -294,8 +269,9 @@ class SendEmailRecommendationView(LoginRequiredMixin, generic.FormView):
         message = f"I recommend {player.in_game_name} for your team on role {player.in_game_role}" \
                     f"\nYou can check their profile out on {player_url}\n\n" \
                     f"{sender_name}\'s comment: {cd['recomendation_text']}"
-        send_mail(subject, message, sender_email,
-                        [cd["to"]])
+        
+        send_email_notification.delay(message, subject, sender_email, [cd["to"]])
+
         self.extra_context["sent"] = True
         return super().form_valid(form)
 
@@ -305,11 +281,9 @@ class AddHighlightView(PermissionRequiredMixin, generic.FormView):
     template_name = "players/add_highlight.html"
     permission_required = "pro_players.add_highlight"
 
-
     def get_success_url(self) -> str:
         return reverse("pro_players:player_info",
                        args=[self.kwargs.get("player_slug")])
-
 
     def form_valid(self, form: Any) -> HttpResponse:
         highlight = form.save(commit=False)

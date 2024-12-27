@@ -13,4 +13,4 @@ media/
 db.json
 static/
 profile_images/
-
+.ruff_cache

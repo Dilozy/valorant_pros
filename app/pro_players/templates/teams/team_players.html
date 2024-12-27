@@ -13,6 +13,7 @@
 {% endblock category %}
 
 {% block content %}
+{% include "match_score.html" with target_team_slug=team.slug %}
 <div class="cards-container">
     {% for player in players %}
     <div class="player-card">
@@ -29,6 +30,8 @@
     </div>
     {% endwith %}
     {% endfor %}
+
+
 </div>
 {% endblock content %}
 
@@ -68,3 +71,4 @@
         </div>
     {% endif %}
 {% endblock comments %}
+

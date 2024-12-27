@@ -1,4 +1,5 @@
 from django_filters import FilterSet, ChoiceFilter
+
 from .models import Player
 
 

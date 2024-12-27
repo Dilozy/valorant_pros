@@ -31,6 +31,7 @@ else
 fi
 
 echo "Checking for static files..."
+
 if ! find /app/staticfiles -type f | grep -q .; then
   echo "Collecting static files..."
   python manage.py collectstatic --noinput

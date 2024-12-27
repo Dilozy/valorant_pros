@@ -1,10 +1,10 @@
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.urls import path, include, re_path
+
 from . import views
 
 
 app_name = "api"
-
 
 teams_patterns = [
     path("<str:pk>/new-player/",

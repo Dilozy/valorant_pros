@@ -1,9 +1,9 @@
 from django.urls import path, include
+
 from . import views
 
 
 app_name = "pro_players"
-
 
 region_patterns = [
     path("", views.TeamsInRegionView.as_view(), name="teams"),
@@ -24,10 +24,12 @@ urlpatterns = [
     path("", views.HomePageView.as_view(), name="home"),
     path("all-players/", views.AllPlayersList.as_view(), name="all_players"),
     path("player/<slug:player_slug>/", views.PlayerDetailsView.as_view(), name="player_info"),
-    path("player/<slug:player_slug>/add-highlight/", views.AddHighlightView.as_view(), name="add_highlight"),
+    path("player/<slug:player_slug>/add-highlight/",
+         views.AddHighlightView.as_view(), name="add_highlight"),
     path("player/<slug:player_slug>/edit/", views.EditPlayerView.as_view(), name="edit_player"),
-    path("player/<slug:player_slug>/send-recomendation/",
+    path("player/<slug:player_slug>/send-recommendation/",
          views.SendEmailRecommendationView.as_view(), name="send_email_recommendation"),
-    path("player/<slug:player_slug>/eradicate/", views.EradicatePlayerView.as_view(), name="eradicate_player"),
+    path("player/<slug:player_slug>/eradicate/",
+         views.EradicatePlayerView.as_view(), name="eradicate_player"),
     path("<str:region>/", include(region_patterns)),
 ]
